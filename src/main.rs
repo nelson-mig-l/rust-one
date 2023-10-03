@@ -22,52 +22,62 @@ struct Args {
 
 fn main() {
     println!("Hello, world!");
+
     let args = Args::parse();
     println!("{}", &args.pattern);
-    xyz();
-    let s = "POLYGON ((35 10, 45 45, 15 40, 10 20, 35 10), (20 30, 35 35, 30 20, 20 30))";
-    let g = wkt::Wkt::<f64>::from_str(s).unwrap();
-    let result = Geometry::try_from(g.clone());
-    //g.contains(&g);
-    let line_string = line_string![
-        (x: 0., y: 0.),
-        (x: 2., y: 0.),
-        (x: 2., y: 2.),
-        (x: 0., y: 2.),
-        (x: 0., y: 0.),
-    ];
-    let polygon = Polygon::new(line_string.clone(), vec![]);
+    // let s = "POLYGON ((35 10, 45 45, 15 40, 10 20, 35 10), (20 30, 35 35, 30 20, 20 30))";
+    // let g = wkt::Wkt::<f64>::from_str(s).unwrap();
+    // let result = Geometry::try_from(g.clone());
+    // //g.contains(&g);
+    // let line_string = line_string![
+    //     (x: 0., y: 0.),
+    //     (x: 2., y: 0.),
+    //     (x: 2., y: 2.),
+    //     (x: 0., y: 2.),
+    //     (x: 0., y: 0.),
+    // ];
+    // let polygon = Polygon::new(line_string.clone(), vec![]);
 
-
-    println!("{}", g);
-    println!("{}", TypeId::of::<Polygon>() == line_string.type_id());
-    //let other = &result.unwrap();
-    //println!("{}", Contains::contains(other, other));
-    println!("{}", Contains::contains(&polygon, &polygon));
-
+    let data = get_data();
+    for ele in data {
+        let g = wkt::Wkt::<f64>::from_str(&ele).unwrap();
+        let result = Geometry::try_from(g.clone());
+        print!("{}", g);
+    }
+    // println!("{}", g);
+    // println!("{}", TypeId::of::<Polygon>() == line_string.type_id());
+    // //let other = &result.unwrap();
+    // //println!("{}", Contains::contains(other, other));
+    // println!("{}", Contains::contains(&polygon, &polygon));
+    println!();
     println!("Goodbye, world!");
 }
 
-fn fromPipe() -> Vec<std::io::Result<String>> {
-    return stdin()
+fn get_data() -> Vec<String> {
+    if atty::is(atty::Stream::Stdin) {
+        println!("File");
+        return from_file("example.txt");
+    } else {
+        println!("Pipe");
+        return from_pipe();
+    }
+}
+
+fn from_pipe() -> Vec<String> {
+    let data = stdin()
         .lock()
         .lines()
+        .map(|line| line.unwrap())
         .collect::<Vec<_>>();
+    return data;
 
 }
 
-fn fromFile(filename: &str) {
-    let lines = read_to_string(filename)
+fn from_file(filename: &str) -> Vec<String> {
+    let data = read_to_string(filename)
         .unwrap()
         .lines()
+        .map(String::from)
         .collect::<Vec<_>>();
-}
-
-fn xyz() {
-    if atty::isnt(atty::Stream::Stdin) {
-        stdin()
-            .lock()
-            .lines()
-            .for_each(|line| println!("{}", line.unwrap()));
-    }
+    return data;
 }

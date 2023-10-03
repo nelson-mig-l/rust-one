@@ -8,3 +8,5 @@ type <FILE> | rust-one.exe
 cargo build
 cargo  watch -x run
 ```
+
+https://docs.rs/geo/latest/geo/

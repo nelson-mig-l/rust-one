@@ -2,16 +2,14 @@ extern crate atty;
 extern crate wkt;
 
 mod load;
+mod filters;
 
-use std::any::{Any, TypeId};
+use std::any::Any;
 use std::str::FromStr;
 use clap::Parser;
 use geo::{Contains, Geometry};
-use geo::{line_string, point, Polygon};
-use std::iter::Map;
-use std::vec::IntoIter;
-use wkt::Wkt;
-use core::result::Iter;
+use geo::{line_string, point};
+use crate::filters::get_filter;
 
 
 #[derive(Parser)]
@@ -24,7 +22,10 @@ fn main() {
     println!("Hello, world!");
 
     let args = Args::parse();
-    println!("{}", &args.pattern);
+    let pattern = &args.pattern;
+    println!("{}", pattern);
+    let filter = get_filter(pattern);
+
     // //g.contains(&g);
     // let line_string = line_string![
     //     (x: 0., y: 0.),
@@ -39,10 +40,10 @@ fn main() {
     for ele in data {
         let g = wkt::Wkt::<f64>::from_str(&ele).unwrap();
         let result = Geometry::try_from(g.clone());
-        print!("{}", g);
+        if filter(result.unwrap()) {
+            println!("{}", g);
+        }
     }
-    // println!("{}", g);
-    // println!("{}", TypeId::of::<Polygon>() == line_string.type_id());
     // //let other = &result.unwrap();
     // //println!("{}", Contains::contains(other, other));
     // println!("{}", Contains::contains(&polygon, &polygon));

@@ -4,13 +4,13 @@ use std::io::{BufRead, stdin};
 use std::fs::read_to_string;
 
 pub fn get_data() -> Vec<String> {
-    if atty::is(atty::Stream::Stdin) {
+    return if atty::is(atty::Stream::Stdin) {
         println!("File");
-        return from_file("example.txt");
+        from_file("example.txt")
     } else {
         println!("Pipe");
-        return from_pipe();
-    }
+        from_pipe()
+    };
 }
 
 fn from_pipe() -> Vec<String> {
@@ -20,7 +20,6 @@ fn from_pipe() -> Vec<String> {
         .map(|line| line.unwrap())
         .collect::<Vec<_>>();
     return data;
-
 }
 
 fn from_file(filename: &str) -> Vec<String> {
